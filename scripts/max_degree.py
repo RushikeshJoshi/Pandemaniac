@@ -3,14 +3,15 @@ CS144 Pandemaniac Project - 2016
 Professor Wierman
 Authors: Rushikesh Joshi and Johno Ikpeazu
 
-Generate random nodes to submit for scoring. This algorithm was able 
-to get us early points for the Pandemaniac project. More sophisticated 
-algorithms will follow.
+This algorithm will generate nodes for submission that have the greatest 
+degree centrality.
 '''
 
 import sys
 import json
 import random
+import networkx as nx
+from operator import itemgetter, attrgetter
 
 def parse_filename(filename):
     # Retrieve relevant information from name of graph
@@ -25,23 +26,31 @@ def parse_graph(file_string):
     with open(file_string, 'r') as f:
         data = json.load(f)
 
-    # Create an empty list to store all of our nodes
-    nodes = []
+    # Create a networkx graph from our adjacency list data
+    G = nx.from_dict_of_lists(data)
 
-    # Append every node to our list "nodes"
-    for key in data.keys():
-        nodes.append(int(key))
-    return nodes
+    return G
 
-def write_output(filename, nodes):
+def generate_nodes(graph):
+
+    values = []
+    nodes = nx.degree_centrality(graph)
+    for node in nodes:
+        values.append((node, nodes[node]))
+
+    values.sort(key = itemgetter(1), reverse = True)
+    return values
+
+
+def write_output(filename, nodes, num_seeds):
     # Open file to write results in for submission
-    outPath = "results/" + filename + ".txt"
+    outPath = "results/" + filename + "_degree.txt"
     output = open(outPath, 'w')
 
     # Generate random nodes to use for submission
-    for i in range(50 * num_seeds):
-        rand_val = random.randint(0, len(nodes) - 1)
-        output.write(str(nodes[rand_val]) + "\n")
+    for i in range(50):
+        for j in range(num_seeds):
+            output.write(str(nodes[j][0]) + "\n")
 
     output.close()
 
@@ -55,7 +64,11 @@ filename = file_string[7:-5]
 num_players, num_seeds, id = parse_filename(filename)
 
 # Retrieve list of all nodes
-nodes = parse_graph(file_string)
+graph = parse_graph(file_string)
 
-write_output(filename, nodes)
+# Retrieve a list sorted in descending order of node and degree centrality
+nodes = generate_nodes(graph)
+
+# Write the values to output file
+write_output(filename, nodes, num_seeds)
 
