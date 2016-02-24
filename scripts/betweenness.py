@@ -34,7 +34,7 @@ def parse_graph(file_string):
 def generate_nodes(graph):
 
     values = []
-    nodes = nx.closeness_centrality(graph)
+    nodes = nx.betweenness_centrality(graph, k=len(graph)/10)
     for node in nodes:
         values.append((node, nodes[node]))
 

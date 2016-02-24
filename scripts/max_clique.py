@@ -41,7 +41,7 @@ def generate_nodes(graph):
 
 def write_output(filename, nodes, num_seeds):
     # Open file to write results in for submission
-    outPath = "results/" + filename + "_degree.txt"
+    outPath = "results/" + filename + "_clique.txt"
     output = open(outPath, 'w')
 
     # Generate random nodes to use for submission

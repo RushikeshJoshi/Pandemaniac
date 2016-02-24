@@ -26,42 +26,45 @@ def parse_graph(file_string):
     # Open the file and decode the json information
     with open(file_string, 'r') as f:
         data = json.load(f)
+    return data
 
-    # Create a networkx graph from our adjacency list data
-    G = nx.from_dict_of_lists(data)
-
-    return G
-
-def generate_nodes(graph):
-
-    values = []
-    nodes = nx.degree_centrality(graph)
-    for node in nodes:
-        values.append((node, nodes[node]))
-
-    values.sort(key = itemgetter(1), reverse = True)
-    return values
-
-def format_nodes(num_seeds, nodes):
+def format_nodes(data, results, trial):
 	strategies = {}
 
-# Load the file as python argument
-file_string = sys.argv[1]
+	for key in trial:
+		count = 0
+		for iteration in trial[key]:
+			strategies["trial" + str(count)] = iteration
+			count += 1
 
-# Remove the .json extension from file_string
-filename = file_string[7:-5]
+	for key in results:
+		count = 0
+		for iteration in results[key]:
+			strategies[key + str(count)] = iteration
+			count += 1
+
+	return strategies
+
+# Load the file as python argument
+graph = parse_graph(sys.argv[1])
+
+# Load the results for corresponding graph
+results = parse_graph(sys.argv[2])
+
+# Trial method that we are testing
+trial = parse_graph(sys.argv[3])
 
 # Retrieve relevant (descriptive) info from graph name
 num_players, num_seeds, id = parse_filename(filename)
 
-# Retrieve list of all nodes
-graph = parse_graph(file_string)
-
-# Retrieve a list sorted in descending order of node and degree centrality
-nodes = generate_nodes(graph)
-
 # Format seed nodes in proper format for simulation
-strategies = format_nodes(num_seeds, nodes)
+strategies = format_nodes(data, results, trial)
 
+print strategies.keys()
+
+'''
 # Run simulation to compare scores of various strategies
 sim.run(graph, strategies)
+'''
+
+
