@@ -32,16 +32,26 @@ def parse_graph(file_string):
 
     return G
 
-def generate_nodes(graph):
+def generate_nodes(graph, num_seeds):
+    
+    seeds = []
     max_ind, cliques = clique.clique_removal(graph)
-    cliques = sorted(cliques, key = len, reverse = True)
+    # sort such that the largest cliques are in front
+    cliques = map(list, (sorted(cliques, key = len, reverse = True)))
+    # [ [(n11, deg(n11), (n12, deg(n12)), ... (n1m, deg(n1m))], [(n21, deg(n21)), ( 
     clique_degree = map(lambda clique: map(lambda node: (node, nx.degree(graph, node)), clique), cliques)
-    clique_degree = map(lambda clique: sorted(clique, reverse = True, key = lambda (node, degree): degree), clique_degree)
-    return [cliq[0][0] for cliq in clique_degree]
+    clique_degree = map(lambda clique: sorted(clique, key = lambda (node, degree): degree, reverse = True), clique_degree)
+    
+    degree_rank_within_clique = 0
+    while len(seeds) < num_seeds:
+        clique_degree = filter(lambda cliq: len(cliq) > degree_rank_within_clique, clique_degree) 
+        seeds.extend(cliq[degree_rank_within_clique][0] for cliq in clique_degree if cliq[degree_rank_within_clique][0] not in seeds)
+    
+    return seeds[:num_seeds]
 
 def write_output(filename, nodes, num_seeds):
     # Open file to write results in for submission
-    outPath = "results/" + filename + "_degree.txt"
+    outPath = "results/" + filename + "_clique.txt"
     output = open(outPath, 'w')
 
     # Generate random nodes to use for submission
@@ -65,7 +75,7 @@ if __name__ == '__main__':
     graph = parse_graph(file_string)
     
     # Retrieve a list sorted in descending order of node and degree centrality
-    nodes = generate_nodes(graph)
+    nodes = generate_nodes(graph, num_seeds)
     
     # Write the values to output file
     write_output(filename, nodes, num_seeds)
