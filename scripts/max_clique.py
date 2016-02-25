@@ -57,7 +57,7 @@ def write_output(filename, nodes, num_seeds):
     # Generate random nodes to use for submission
     for i in range(50):
         for j in range(num_seeds):
-            output.write(str(nodes[j][0]) + "\n")
+            output.write(str(nodes[j]) + "\n")
 
     output.close()
 

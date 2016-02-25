@@ -60,7 +60,7 @@ def run(adj_list, node_mappings):
                  of seed nodes associated with that name.
   """
   results = run_simulation(adj_list, node_mappings)
-  return results
+  print results
 
 
 def run_simulation(adj_list, node_mappings):
